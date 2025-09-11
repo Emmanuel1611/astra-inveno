@@ -217,29 +217,25 @@ const Dashboard = () => {
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               <button
-                className={`rounded-full px-3 py-1.5 text-sm ${range === "7D" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                className={`rounded-full px-3 py-1.5 text-sm ${range === "7D" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                 onClick={() => setRange("7D")}
               >
                 Last 7 days
               </button>
               <button
-                className={`rounded-full px-3 py-1.5 text-sm ${range === "30D" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                className={`rounded-full px-3 py-1.5 text-sm ${range === "30D" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                 onClick={() => setRange("30D")}
               >
                 Last 30 days
               </button>
               <button
-                className={`rounded-full px-3 py-1.5 text-sm ${range === "QTD" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                className={`rounded-full px-3 py-1.5 text-sm ${range === "QTD" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                 onClick={() => setRange("QTD")}
               >
                 Quarter-to-date
               </button>
               <button
-                className={`rounded-full px-3 py-1.5 text-sm ${range === "YTD" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                className={`rounded-full px-3 py-1.5 text-sm ${range === "YTD" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                 onClick={() => setRange("YTD")}
               >
                 Year-to-date
@@ -255,30 +251,30 @@ const Dashboard = () => {
               <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm">
                 <Filter className="h-4 w-4 text-gray-500" />
                 <select
-                  className="bg-transparent text-gray-700 focus:outline-none"
+                  className="bg-white text-indigo-600 focus:outline-none"
                   value={warehouse}
                   onChange={(e) => setWarehouse(e.target.value)}
                 >
-                  <option>All Warehouses</option>
-                  <option>Kampala HQ</option>
-                  <option>Gulu Depot</option>
-                  <option>Mbarara Hub</option>
+                  <option className="text-indigo-600">All Warehouses</option>
+                  <option className="text-indigo-600">Kampala HQ</option>
+                  <option className="text-indigo-600">Gulu Depot</option>
+                  <option className="text-indigo-600">Mbarara Hub</option>
                 </select>
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm">
                 <Tag className="h-4 w-4 text-gray-500" />
                 <select
-                  className="bg-transparent text-gray-700 focus:outline-none"
+                  className="bg-white text-indigo-600 focus:outline-none"
                   value={channel}
                   onChange={(e) => setChannel(e.target.value)}
                 >
-                  <option>All Channels</option>
-                  <option>Online</option>
-                  <option>Retail</option>
-                  <option>Wholesale</option>
+                  <option className="text-indigo-600">All Channels</option>
+                  <option className="text-indigo-600">Online</option>
+                  <option className="text-indigo-600">Retail</option>
+                  <option className="text-indigo-600">Wholesale</option>
                 </select>
               </div>
-              <button className="inline-flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1.5 text-sm text-white hover:bg-black">
+              <button className="inline-flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1.5 text-sm text-white">
                 <Download className="h-4 w-4" /> Export
               </button>
             </div>
