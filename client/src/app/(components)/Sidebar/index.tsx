@@ -1,11 +1,5 @@
 "use client";
 
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-  }
-}
-
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/state";
 import {
@@ -20,8 +14,6 @@ import {
   Package,
   Truck,
   Boxes,
-  Crown,
-  ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -72,10 +64,9 @@ const Sidebar = () => {
   const sidebarClassNames = `fixed flex flex-col ${isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"
     } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
-  //  Subscription State 
+  // --- Subscription State ---
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [planName, setPlanName] = useState("Professional");
 
   useEffect(() => {
     async function fetchSubscription() {
@@ -90,7 +81,6 @@ const Sidebar = () => {
         const days = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
         setDaysLeft(days);
-        if (data.planName) setPlanName(data.planName);
       } catch (error) {
         console.error("Error fetching subscription:", error);
       } finally {
@@ -113,29 +103,6 @@ const Sidebar = () => {
     setIsPurchasesOpen(menu === "purchases" ? !isPurchasesOpen : false);
     setIsReportsOpen(menu === "reports" ? !isReportsOpen : false);
   };
-
-  const handleSubscriptionClick = () => {
-    // Track the click event
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'subscription_button_clicked', {
-        event_category: 'subscription',
-        event_label: daysLeft && daysLeft > 0 ? 'renewal' : 'new_subscription'
-      });
-    }
-    
-    // Open subscription page
-    window.open('https://payment-gateway-link.com', '_blank', 'noopener,noreferrer');
-  };
-
-  const getSubscriptionStatus = () => {
-    if (loading) return { color: 'gray', text: 'Checking...', urgent: false };
-    if (!daysLeft || daysLeft === 0) return { color: 'red', text: 'Expired', urgent: true };
-    if (daysLeft <= 7) return { color: 'orange', text: `${daysLeft} days left`, urgent: true };
-    if (daysLeft <= 30) return { color: 'yellow', text: `${daysLeft} days left`, urgent: false };
-    return { color: 'green', text: `${daysLeft} days left`, urgent: false };
-  };
-
-  const status = getSubscriptionStatus();
 
   return (
     <div className={sidebarClassNames}>
@@ -180,8 +147,8 @@ const Sidebar = () => {
           <button
             onClick={() => toggleDropdown("inventory")}
             className={`w-full flex items-center ${isSidebarCollapsed
-                ? "justify-center py-4"
-                : "justify-between px-8 py-4"
+              ? "justify-center py-4"
+              : "justify-between px-8 py-4"
               } hover:bg-blue-100 transition-colors`}
           >
             <div className="flex items-center gap-3">
@@ -214,6 +181,7 @@ const Sidebar = () => {
               >
                 Price Lists
               </Link>
+
               <Link
                 href="/inventory/adjustments"
                 className="font-medium text-gray-700 px-3 py-2 rounded-md transition-all duration-200 ease-in-out hover:bg-blue-50 hover:text-blue-600 hover:scale-105"
@@ -230,13 +198,13 @@ const Sidebar = () => {
           )}
         </div>
 
-        {/* Sales Dropdown */}
+        {/* Sales */}
         <div>
           <button
             onClick={() => toggleDropdown("sales")}
             className={`w-full flex items-center ${isSidebarCollapsed
-                ? "justify-center py-4"
-                : "justify-between px-8 py-4"
+              ? "justify-center py-4"
+              : "justify-between px-8 py-4"
               } hover:bg-blue-100 transition-colors`}
           >
             <div className="flex items-center gap-3">
@@ -279,13 +247,13 @@ const Sidebar = () => {
           )}
         </div>
 
-        {/* Purchases Dropdown */}
+        {/* Purchases */}
         <div>
           <button
             onClick={() => toggleDropdown("purchases")}
             className={`w-full flex items-center ${isSidebarCollapsed
-                ? "justify-center py-4"
-                : "justify-between px-8 py-4"
+              ? "justify-center py-4"
+              : "justify-between px-8 py-4"
               } hover:bg-blue-100 transition-colors`}
           >
             <div className="flex items-center gap-3">
@@ -340,8 +308,8 @@ const Sidebar = () => {
         <div>
           <Link href="/reports">
             <div className={`w-full flex items-center ${isSidebarCollapsed
-                ? "justify-center py-4"
-                : "justify-between px-8 py-4"
+              ? "justify-center py-4"
+              : "justify-between px-8 py-4"
               } hover:bg-blue-100 transition-colors`}
             >
               <div className="flex items-center gap-3">
@@ -356,95 +324,58 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* FOOTER -Subscription Card */}
-      <div className={`${isSidebarCollapsed ? "hidden" : "block"} mb-4 mx-3`}>
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 shadow-sm">
-          {/* Plan Header */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Crown className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-semibold text-gray-800">{planName}</span>
-            </div>
-            {status.urgent && (
-              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                status.color === 'red' 
-                  ? 'bg-red-100 text-red-700' 
-                  : 'bg-orange-100 text-orange-700'
-              }`}>
-                {status.color === 'red' ? 'EXPIRED' : 'URGENT'}
-              </div>
-            )}
-          </div>
-
-          {/* Status */}
+      {/* FOOTER */}
+      <div className={`${isSidebarCollapsed ? "hidden" : "block"} mt-auto px-3 pb-4`}>
+        {/* Subscription Card */}
+        <div className="rounded-md border border-gray-200 bg-white shadow-sm p-3">
           {loading ? (
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-sm text-gray-600">Checking subscription...</span>
-            </div>
+            <p className="text-xs text-gray-400 animate-pulse">Checking subscription...</p>
           ) : (
-            <div className="flex items-center gap-2 mb-3">
-              {status.color === 'red' ? (
-                <AlertTriangle className="w-4 h-4 text-red-600" />
-              ) : (
-                <Clock className={`w-4 h-4 ${
-                  status.color === 'orange' ? 'text-orange-600' : 
-                  status.color === 'yellow' ? 'text-yellow-600' : 'text-green-600'
-                }`} />
+            <>
+              {/* Status */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  {daysLeft === 0 ? (
+                    <AlertTriangle className="w-4 h-4 text-red-500" />
+                  ) : (
+                    <Clock className="w-4 h-4 text-gray-500" />
+                  )}
+                  <span className="text-sm font-medium text-gray-700">
+                    {daysLeft && daysLeft > 0
+                      ? `${daysLeft} days left`
+                      : "Expired"}
+                  </span>
+                </div>
+                <a
+                  href="https://payment-gateway-link.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-md shadow-sm transition 
+              ${daysLeft && daysLeft > 0
+                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      : "bg-red-500 hover:bg-red-600 text-white"}`}
+                >
+                  {daysLeft && daysLeft > 0 ? "Renew" : "Subscribe"}
+                </a>
+              </div>
+
+              {/* Progress Bar */}
+              {daysLeft !== null && daysLeft > 0 && (
+                <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-1.5 bg-blue-500 transition-all duration-500"
+                    style={{ width: `${Math.min((daysLeft / 30) * 100, 100)}%` }} // adjust denominator if not 30 days
+                  ></div>
+                </div>
               )}
-              <span className={`text-sm font-medium ${
-                status.color === 'red' ? 'text-red-700' : 
-                status.color === 'orange' ? 'text-orange-700' : 
-                status.color === 'yellow' ? 'text-yellow-700' : 'text-green-700'
-              }`}>
-                {status.text}
-              </span>
-            </div>
-          )}
-
-          {/* Subscription Button */}
-          <button
-            onClick={handleSubscriptionClick}
-            className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-sm ${
-              status.color === 'red'
-                ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-200'
-                : status.urgent
-                ? 'bg-orange-600 hover:bg-orange-700 text-white shadow-orange-200'
-                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200'
-            }`}
-            disabled={loading}
-          >
-            <span>
-              {loading 
-                ? 'Loading...' 
-                : (daysLeft && daysLeft > 0) 
-                  ? 'Renew Subscription' 
-                  : 'Subscribe Now'
-              }
-            </span>
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
-
-          {/* Additional Info */}
-          {!loading && (
-            <div className="mt-3 text-center">
-              <p className="text-xs text-gray-500">
-                {status.color === 'red' 
-                  ? 'Renew now to avoid service interruption'
-                  : status.urgent
-                  ? 'Renew soon to avoid interruption'
-                  : 'Manage your subscription'
-                }
-              </p>
-            </div>
+            </>
           )}
         </div>
 
         {/* Copyright */}
-        <div className="text-center mt-3">
-          <p className="text-xs text-gray-400">&copy; 2025 Astra</p>
-        </div>
+        <p className="mt-3 text-[10px] text-gray-400 text-center">&copy; 2025 Astra</p>
       </div>
+
     </div>
   );
 };
