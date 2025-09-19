@@ -142,7 +142,7 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
 
-        {/* Inventory Dropdown */}
+        {/* Inventory */}
         <div>
           <button
             onClick={() => toggleDropdown("inventory")}
