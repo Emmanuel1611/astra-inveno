@@ -2,10 +2,12 @@
 
 import { Save } from "lucide-react";
 
-export default function EditItemPage({ params }: { params: { id: string } }) {
+export default async function EditInventoryItemPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   return (
     <div className="p-6 max-w-3xl">
-      <h1 className="text-2xl font-semibold mb-6">Edit Item #{params.id}</h1>
+      <h1 className="text-2xl font-semibold mb-6">Edit Item #{id}</h1>
 
       <form className="space-y-6">
         <div>
