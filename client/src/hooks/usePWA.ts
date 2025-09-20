@@ -193,12 +193,46 @@ export const usePWA = () => {
         await registration.showNotification(title, {
           icon: '/icon-192x192.png',
           badge: '/icon-192x192.png',
-          vibrate: [200, 100, 200],
           ...options
         });
       }
     }
   };
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          await navigator.serviceWorker.register('/sw.js');
+
+          // Request permission and show a notification (example)
+          if ('Notification' in window) {
+            const perm = await Notification.requestPermission();
+            if (perm === 'granted') {
+              const options = {
+                icon: '/icon-192x192.png',
+                badge: '/icon-192x192.png',
+                vibrate: [200, 100, 200],
+                body: 'App ready for offline use',
+                data: { url: '/' }
+              } as NotificationOptions & { vibrate?: number[] }; // <-- type assertion
+
+              // If service worker registration available, prefer its showNotification
+              const reg = await navigator.serviceWorker.getRegistration();
+              if (reg?.showNotification) {
+                reg.showNotification('Inventory Management', options as NotificationOptions);
+              } else {
+                new Notification('Inventory Management', options);
+              }
+            }
+          }
+
+        } catch (error) {
+          console.error('Service Worker registration failed:', error);
+        }
+      });
+    }
+  }, []);
 
   return {
     ...pwaState,

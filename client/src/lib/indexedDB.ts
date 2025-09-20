@@ -229,7 +229,8 @@ class IndexedDBManager {
     const store = this.getStore('offlineActions');
     const index = store.index('synced');
     return new Promise((resolve, reject) => {
-      const request = index.getAll(false);
+      const keyRange = IDBKeyRange.only(false);
+      const request = index.getAll(keyRange);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
