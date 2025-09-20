@@ -1,9 +1,10 @@
 "use client";
 
 import { Save } from "lucide-react";
+import { use } from "react";
 
-export default async function EditInventoryItemPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function EditInventoryItemPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
 
   return (
     <div className="p-6 max-w-3xl">
