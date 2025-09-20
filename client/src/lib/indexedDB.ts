@@ -35,56 +35,62 @@ export interface OfflineAction {
   synced: boolean;
 }
 
-class IndexedDBManager {
+export const dbConfig = {
+  name: 'inventoryDB',
+  version: 1,
+  stores: {
+    items: {
+      keyPath: 'id',
+      indexes: [
+        { name: 'sku', unique: true },
+        { name: 'lastSynced', unique: false }
+      ]
+    },
+    movements: {
+      keyPath: 'id',
+      indexes: [
+        { name: 'syncStatus', unique: false },
+        { name: 'createdAt', unique: false }
+      ]
+    },
+    syncQueue: {
+      keyPath: 'id',
+      indexes: [
+        { name: 'status', unique: false },
+        { name: 'timestamp', unique: false }
+      ]
+    }
+  }
+};
+
+export class IndexedDBManager {
   private db: IDBDatabase | null = null;
-  private readonly dbName = 'AstraInventoryDB';
-  private readonly version = 1;
 
-  async init(): Promise<void> {
+  async init() {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, this.version);
+      const request = indexedDB.open(dbConfig.name, dbConfig.version);
 
-      request.onerror = () => {
-        console.error('IndexedDB error:', request.error);
-        reject(request.error);
-      };
-
+      request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         this.db = request.result;
-        console.log('IndexedDB initialized successfully');
-        resolve();
+        resolve(this.db);
       };
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
-
-        // Products store
-        if (!db.objectStoreNames.contains('products')) {
-          const productsStore = db.createObjectStore('products', { keyPath: 'id' });
-          productsStore.createIndex('name', 'name', { unique: false });
-          productsStore.createIndex('category', 'category', { unique: false });
-        }
-
-        // Purchase Orders store
-        if (!db.objectStoreNames.contains('purchaseOrders')) {
-          const ordersStore = db.createObjectStore('purchaseOrders', { keyPath: 'id' });
-          ordersStore.createIndex('productId', 'productId', { unique: false });
-          ordersStore.createIndex('status', 'status', { unique: false });
-          ordersStore.createIndex('orderDate', 'orderDate', { unique: false });
-        }
-
-        // Offline Actions store (for sync when back online)
-        if (!db.objectStoreNames.contains('offlineActions')) {
-          const actionsStore = db.createObjectStore('offlineActions', { keyPath: 'id' });
-          actionsStore.createIndex('synced', 'synced', { unique: false });
-          actionsStore.createIndex('timestamp', 'timestamp', { unique: false });
-        }
-
-        // Settings/Cache store
-        if (!db.objectStoreNames.contains('settings')) {
-          db.createObjectStore('settings', { keyPath: 'key' });
-        }
+        this.createStores(db);
       };
+    });
+  }
+
+  private createStores(db: IDBDatabase) {
+    Object.entries(dbConfig.stores).forEach(([storeName, config]) => {
+      if (!db.objectStoreNames.contains(storeName)) {
+        const store = db.createObjectStore(storeName, { keyPath: config.keyPath });
+        config.indexes.forEach(index => {
+          store.createIndex(index.name, index.name, { unique: index.unique });
+        });
+      }
     });
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { dbManager, OfflineAction } from './indexedDB';
+import { dbManager, OfflineAction, IndexedDBManager } from './indexedDB';
 
 interface SyncOptions {
   retryAttempts?: number;
@@ -8,34 +8,31 @@ interface SyncOptions {
 }
 
 export class SyncManager {
-  private isOnline: boolean = true;
+  private indexedDB: IndexedDBManager;
+  private isOnline: boolean = navigator.onLine;
+  private syncInterval: NodeJS.Timeout | null = null;
   private syncInProgress: boolean = false;
   private retryQueue: OfflineAction[] = [];
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      this.isOnline = navigator.onLine;
-      this.setupEventListeners();
-    }
+    this.indexedDB = new IndexedDBManager();
+    this.setupListeners();
   }
 
-  private setupEventListeners() {
-    window.addEventListener('online', this.handleOnline.bind(this));
-    window.addEventListener('offline', this.handleOffline.bind(this));
+  private setupListeners() {
+    window.addEventListener('online', () => {
+      console.log('Network back online - starting sync...');
+      this.isOnline = true;
+      this.syncData();
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('Network went offline');
+      this.isOnline = false;
+    });
   }
 
-  private handleOnline() {
-    console.log('Network back online - starting sync...');
-    this.isOnline = true;
-    this.syncOfflineData();
-  }
-
-  private handleOffline() {
-    console.log('Network went offline');
-    this.isOnline = false;
-  }
-
-  async syncOfflineData(options: SyncOptions = {}) {
+  async syncData(options: SyncOptions = {}) {
     if (!this.isOnline || this.syncInProgress) {
       console.log('Sync skipped - offline or already in progress');
       return;
@@ -140,7 +137,7 @@ export class SyncManager {
   // Manual sync trigger
   async forcSync(): Promise<void> {
     if (this.isOnline) {
-      await this.syncOfflineData();
+      await this.syncData();
     } else {
       throw new Error('Cannot sync while offline');
     }
@@ -159,6 +156,17 @@ export class SyncManager {
       syncInProgress: this.syncInProgress,
       retryQueueLength: this.retryQueue.length,
     };
+  }
+
+  startAutoSync(intervalMs: number = 5000) {
+    this.syncInterval = setInterval(() => this.syncData(), intervalMs);
+  }
+
+  stopAutoSync() {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+      this.syncInterval = null;
+    }
   }
 }
 
