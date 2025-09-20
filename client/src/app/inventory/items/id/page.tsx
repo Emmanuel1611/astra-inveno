@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { Edit, Package } from "lucide-react";
+import { use } from 'react'; // Add this import
 
-export default async function InventoryItemPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function InventoryItemPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params); // Use the use() hook instead of await
 
   return (
     <div className="p-6">
