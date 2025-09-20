@@ -4,14 +4,14 @@ import path from "path";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "",
-        port: "",
-        pathname: "/**",
-      },
-    ],
+    // Remove the empty remotePatterns or add actual domains
+    // remotePatterns: [
+    //   {
+    //     protocol: "https",
+    //     hostname: "example.com", // Add actual hostname when needed
+    //     pathname: "/**",
+    //   },
+    // ],
   },
   async headers() {
     return [
