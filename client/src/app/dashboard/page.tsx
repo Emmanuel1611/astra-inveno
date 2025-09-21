@@ -318,7 +318,7 @@ const Dashboard = () => {
           <SectionCard
             title="Sales vs Purchases vs Expenses"
             actions={
-              <div className="text-xs text-gray-500">UGX • Aug 2025</div>
+              <div className="text-xs text-gray-500">UGX • Sep 2025</div>
             }
           >
             <div className="h-64">
