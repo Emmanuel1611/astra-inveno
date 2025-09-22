@@ -381,14 +381,15 @@ enum SyncStatus {
 
 model Notification {
   id        String   @id @default(cuid())
-  title     String
-  message   String
-  type      String   @default("INFO") // INFO, WARNING, ERROR, SUCCESS
-  priority  String   @default("MEDIUM") // LOW, MEDIUM, HIGH
-  read      Boolean  @default(false)
-  actionUrl String?
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String   @default("info")  // info, warning, error, success
+  priority  String   @default("medium")  // low, medium, high
+  read      Boolean  @default(false)
+  actionUrl String?
+  timestamp DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

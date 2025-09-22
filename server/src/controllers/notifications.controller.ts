@@ -116,30 +116,3 @@ export const markAllNotificationsAsRead = async (req: AuthenticatedRequest, res:
     res.status(500).json({ error: 'Failed to mark all notifications as read' });
   }
 };
-
-export const createNotification = async (data: {
-  title: string;
-  message: string;
-  type?: 'INFO' | 'WARNING' | 'ERROR' | 'SUCCESS';
-  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
-  userId?: string | null;
-  actionUrl?: string;
-}) => {
-  try {
-    const notification = await prisma.notification.create({
-      data: {
-        title: data.title,
-        message: data.message,
-        type: data.type || 'INFO',
-        priority: data.priority || 'MEDIUM',
-        userId: data.userId || null,
-        actionUrl: data.actionUrl,
-        read: false
-      }
-    });
-    return notification;
-  } catch (error) {
-    console.error('Create notification error:', error);
-    throw error;
-  }
-};

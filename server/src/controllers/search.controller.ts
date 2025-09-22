@@ -25,7 +25,6 @@ export const globalSearch = async (req: AuthenticatedRequest, res: Response) => 
     if (!type || type === 'item') {
       const items = await prisma.item.findMany({
         where: {
-          isActive: true,
           OR: [
             { name: { contains: query, mode: 'insensitive' } },
             { sku: { contains: query, mode: 'insensitive' } },
@@ -62,7 +61,6 @@ export const globalSearch = async (req: AuthenticatedRequest, res: Response) => 
     if (!type || type === 'customer') {
       const customers = await prisma.customer.findMany({
         where: {
-          isActive: true,
           OR: [
             { name: { contains: query, mode: 'insensitive' } },
             { email: { contains: query, mode: 'insensitive' } }

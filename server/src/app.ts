@@ -9,9 +9,9 @@ import authRoutes from './routes/auth.routes';
 import itemsRoutes from './routes/items.routes';
 import warehouseRoutes from './routes/warehouse.routes';
 import inventoryRoutes from './routes/inventory.routes';
-import searchRoutes from './routes/search.routes';
 import notificationsRoutes from './routes/notifications.routes';
-import syncRoutes from './routes/sync.routes';
+import searchRoutes from './routes/search.routes';
+import helpRoutes from './routes/help.routes';
 
 import { errorMiddleware } from './middleware/error.middleware';
 
@@ -29,9 +29,14 @@ app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/items`, itemsRoutes);
 app.use(`${API_PREFIX}/warehouses`, warehouseRoutes);
 app.use(`${API_PREFIX}/inventory`, inventoryRoutes);
-app.use(`${API_PREFIX}/search`, searchRoutes);
 app.use(`${API_PREFIX}/notifications`, notificationsRoutes);
-app.use(`${API_PREFIX}/sync`, syncRoutes);
+app.use(`${API_PREFIX}/search`, searchRoutes);
+app.use(`${API_PREFIX}/help`, helpRoutes);
+
+// Health check route
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 // Error handling
 app.use(errorMiddleware);

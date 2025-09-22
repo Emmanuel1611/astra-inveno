@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.middleware';
-import { getCurrentUser } from '../controllers/auth.controller';
+import { getCurrentUser, logout } from '../controllers/auth.controller';
 
 const router = Router();
 
@@ -11,7 +11,8 @@ router.post('/login', (req, res) => {
   res.send(`Login route for user: ${username}`);
 });
 
-// Add this route to your existing auth routes
+// Add these routes to your existing auth routes
 router.get('/me', authMiddleware, getCurrentUser);
+router.post('/logout', authMiddleware, logout);
 
 export default router;
