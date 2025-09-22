@@ -1,51 +1,396 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" // or "mysql", "sqlite", etc.
   url      = env("DATABASE_URL")
 }
 
+// User Management
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      String   @default("user")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  email       String    @unique
+  username    String    @unique
+  password    String
+  firstName   String
+  lastName    String
+  role        UserRole  @default(USER)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
+  // Relations
+  createdItems     Item[]            @relation("CreatedBy")
+  updatedItems     Item[]            @relation("UpdatedBy")
+  movements        Movement[]
+  salesOrders      SalesOrder[]
+  purchaseOrders   PurchaseOrder[]
+  stockAdjustments StockAdjustment[]
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
+  VIEWER
+}
+
+// Warehouse Management
+model Warehouse {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  address     String?
+  city        String?
+  state       String?
+  country     String?
+  zipCode     String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  items              ItemWarehouse[]
+  movements          Movement[]
+  salesOrderItems    SalesOrderItem[]
+  purchaseOrderItems PurchaseOrderItem[]
+  stockAdjustments   StockAdjustmentItem[]
+
+  @@map("warehouses")
+}
+
+// Product/Item Management
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  parentId    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Self-referential relation for subcategories
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
+  // Relations
+  items Item[]
+
+  @@map("categories")
 }
 
 model Item {
-  id          String     @id @default(uuid())
-  name        String
-  sku         String     @unique
-  description String?
-  quantity    Int        @default(0)
-  unitPrice   Decimal    @db.Decimal(10, 2)
-  movements   Movement[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id             String   @id @default(cuid())
+  sku            String   @unique
+  name           String
+  description    String?
+  categoryId     String?
+  unitOfMeasure  String
+  costPrice      Decimal  @db.Decimal(10, 2)
+  sellingPrice   Decimal  @db.Decimal(10, 2)
+  minStockLevel  Int      @default(0)
+  maxStockLevel  Int?
+  reorderPoint   Int      @default(0)
+  barcode        String?  @unique
+  imageUrl       String?
+  isActive       Boolean  @default(true)
+  trackInventory Boolean  @default(true)
+  createdById    String
+  updatedById    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  category  Category? @relation(fields: [categoryId], references: [id])
+  createdBy User      @relation("CreatedBy", fields: [createdById], references: [id])
+  updatedBy User?     @relation("UpdatedBy", fields: [updatedById], references: [id])
+
+  warehouses           ItemWarehouse[]
+  movements            Movement[]
+  salesOrderItems      SalesOrderItem[]
+  purchaseOrderItems   PurchaseOrderItem[]
+  stockAdjustmentItems StockAdjustmentItem[]
+
+  @@map("items")
 }
 
-model Warehouse {
-  id        String     @id @default(uuid())
-  name      String
-  location  String?
-  movements Movement[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+// Junction table for Item-Warehouse with stock levels
+model ItemWarehouse {
+  id             String   @id @default(cuid())
+  itemId         String
+  warehouseId    String
+  currentStock   Int      @default(0)
+  reservedStock  Int      @default(0)
+  availableStock Int      @default(0) // currentStock - reservedStock
+  lastUpdated    DateTime @default(now())
+
+  // Relations
+  item      Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, warehouseId])
+  @@map("item_warehouses")
 }
 
+// Inventory Movement Tracking
 model Movement {
-  id          String    @id @default(uuid())
-  type        String    // "IN" or "OUT"
-  quantity    Int
-  item        Item      @relation(fields: [itemId], references: [id])
-  itemId      String
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
-  warehouseId String
-  reference   String?
-  createdAt   DateTime  @default(now())
+  id            String         @id @default(cuid())
+  type          MovementType
+  itemId        String
+  warehouseId   String
+  quantity      Int
+  unitCost      Decimal?       @db.Decimal(10, 2)
+  reference     String? // Reference to source document (PO, SO, Adjustment, etc.)
+  referenceType ReferenceType?
+  notes         String?
+  userId        String
+  createdAt     DateTime       @default(now())
+
+  // Relations
+  item      Item      @relation(fields: [itemId], references: [id])
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@map("movements")
+}
+
+enum MovementType {
+  IN // Stock received
+  OUT // Stock issued/sold
+  ADJUSTMENT // Stock adjustment
+  TRANSFER // Transfer between warehouses
+}
+
+enum ReferenceType {
+  PURCHASE_ORDER
+  SALES_ORDER
+  STOCK_ADJUSTMENT
+  TRANSFER
+  MANUAL
+}
+
+// Sales Management
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?  @unique
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  country   String?
+  zipCode   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  salesOrders SalesOrder[]
+
+  @@map("customers")
+}
+
+model SalesOrder {
+  id               String      @id @default(cuid())
+  orderNumber      String      @unique
+  customerId       String
+  userId           String
+  orderDate        DateTime    @default(now())
+  expectedDelivery DateTime?
+  status           OrderStatus @default(PENDING)
+  subtotal         Decimal     @db.Decimal(10, 2)
+  taxAmount        Decimal     @default(0) @db.Decimal(10, 2)
+  totalAmount      Decimal     @db.Decimal(10, 2)
+  notes            String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  // Relations
+  customer Customer         @relation(fields: [customerId], references: [id])
+  user     User             @relation(fields: [userId], references: [id])
+  items    SalesOrderItem[]
+
+  @@map("sales_orders")
+}
+
+model SalesOrderItem {
+  id           String  @id @default(cuid())
+  salesOrderId String
+  itemId       String
+  warehouseId  String
+  quantity     Int
+  unitPrice    Decimal @db.Decimal(10, 2)
+  lineTotal    Decimal @db.Decimal(10, 2)
+
+  // Relations
+  salesOrder SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  item       Item       @relation(fields: [itemId], references: [id])
+  warehouse  Warehouse  @relation(fields: [warehouseId], references: [id])
+
+  @@map("sales_order_items")
+}
+
+// Purchase Management
+model Supplier {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?  @unique
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  country   String?
+  zipCode   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  purchaseOrders PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+model PurchaseOrder {
+  id               String      @id @default(cuid())
+  orderNumber      String      @unique
+  supplierId       String
+  userId           String
+  orderDate        DateTime    @default(now())
+  expectedDelivery DateTime?
+  status           OrderStatus @default(PENDING)
+  subtotal         Decimal     @db.Decimal(10, 2)
+  taxAmount        Decimal     @default(0) @db.Decimal(10, 2)
+  totalAmount      Decimal     @db.Decimal(10, 2)
+  notes            String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  // Relations
+  supplier Supplier            @relation(fields: [supplierId], references: [id])
+  user     User                @relation(fields: [userId], references: [id])
+  items    PurchaseOrderItem[]
+
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String  @id @default(cuid())
+  purchaseOrderId String
+  itemId          String
+  warehouseId     String
+  quantity        Int
+  unitCost        Decimal @db.Decimal(10, 2)
+  lineTotal       Decimal @db.Decimal(10, 2)
+
+  // Relations
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  item          Item          @relation(fields: [itemId], references: [id])
+  warehouse     Warehouse     @relation(fields: [warehouseId], references: [id])
+
+  @@map("purchase_order_items")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+// Stock Adjustments
+model StockAdjustment {
+  id               String           @id @default(cuid())
+  adjustmentNumber String           @unique
+  reason           AdjustmentReason
+  notes            String?
+  userId           String
+  createdAt        DateTime         @default(now())
+
+  // Relations
+  user  User                  @relation(fields: [userId], references: [id])
+  items StockAdjustmentItem[]
+
+  @@map("stock_adjustments")
+}
+
+model StockAdjustmentItem {
+  id                String  @id @default(cuid())
+  stockAdjustmentId String
+  itemId            String
+  warehouseId       String
+  adjustmentQty     Int // Positive for increase, negative for decrease
+  reason            String?
+
+  // Relations
+  stockAdjustment StockAdjustment @relation(fields: [stockAdjustmentId], references: [id], onDelete: Cascade)
+  item            Item            @relation(fields: [itemId], references: [id])
+  warehouse       Warehouse       @relation(fields: [warehouseId], references: [id])
+
+  @@map("stock_adjustment_items")
+}
+
+enum AdjustmentReason {
+  DAMAGED
+  EXPIRED
+  LOST
+  FOUND
+  RECOUNT
+  OTHER
+}
+
+// Sync Management for PWA
+model SyncLog {
+  id          String     @id @default(cuid())
+  entityType  String // 'items', 'movements', etc.
+  entityId    String
+  action      SyncAction
+  syncStatus  SyncStatus @default(PENDING)
+  clientId    String? // PWA client identifier
+  version     Int        @default(1)
+  data        Json? // Store the actual data for conflict resolution
+  error       String?
+  createdAt   DateTime   @default(now())
+  processedAt DateTime?
+
+  @@map("sync_logs")
+}
+
+enum SyncAction {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum SyncStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CONFLICT
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, WARNING, ERROR, SUCCESS
+  priority  String   @default("MEDIUM") // LOW, MEDIUM, HIGH
+  read      Boolean  @default(false)
+  actionUrl String?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notifications")
 }

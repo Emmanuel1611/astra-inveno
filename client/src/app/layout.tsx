@@ -1,14 +1,16 @@
+
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
 import DashboardWrapper from "./dashboardWrapper";
+import QueryProvider from "./providers/QueryProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Astra Inventory",
-  description: "Professional inventory management system for modern businesses",
+  description: "Professional inventory management system for modern and small businesses",
   keywords: ["inventory", "management", "business", "stock", "products"],
   authors: [{ name: "Astra Team" }],
   creator: "Astra",
@@ -79,7 +81,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <DashboardWrapper>{children}</DashboardWrapper>
+        <QueryProvider>
+          <DashboardWrapper>{children}</DashboardWrapper>
+        </QueryProvider>
       </body>
     </html>
   );

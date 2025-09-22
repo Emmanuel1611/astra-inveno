@@ -1,48 +1,39 @@
+// server/src/app.ts
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import morgan from 'morgan';
-import { PrismaClient } from '@prisma/client';
-import { errorHandler } from './middleware/error.middleware';
 
-// try to require the api router module and fallback to a simple router if it's missing
-let apiV1: any;
-try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  apiV1 = require('./api/v1').default;
-} catch (e) {
-  const router = express.Router();
-  router.get('/', (_req, res) => res.json({ message: 'API v1' }));
-  apiV1 = router;
-}
+// Import routes from the correct paths
+import authRoutes from './routes/auth.routes';
+import itemsRoutes from './routes/items.routes';
+import warehouseRoutes from './routes/warehouse.routes';
+import inventoryRoutes from './routes/inventory.routes';
+import searchRoutes from './routes/search.routes';
+import notificationsRoutes from './routes/notifications.routes';
+import syncRoutes from './routes/sync.routes';
 
-const prisma = new PrismaClient();
+import { errorMiddleware } from './middleware/error.middleware';
+
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(helmet());
 app.use(morgan('dev'));
+app.use(express.json());
 
-// API routes
-app.use('/api/v1', apiV1);
+// API Routes
+const API_PREFIX = '/api/v1';
+app.use(`${API_PREFIX}/auth`, authRoutes);
+app.use(`${API_PREFIX}/items`, itemsRoutes);
+app.use(`${API_PREFIX}/warehouses`, warehouseRoutes);
+app.use(`${API_PREFIX}/inventory`, inventoryRoutes);
+app.use(`${API_PREFIX}/search`, searchRoutes);
+app.use(`${API_PREFIX}/notifications`, notificationsRoutes);
+app.use(`${API_PREFIX}/sync`, syncRoutes);
 
 // Error handling
-app.use(errorHandler);
+app.use(errorMiddleware);
 
-const PORT = process.env.PORT || 5000;
-
-async function main() {
-  try {
-    await prisma.$connect();
-    console.log('Database connected successfully');
-    
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-    process.exit(1);
-  }
-}
-
-main();
+export default app;
