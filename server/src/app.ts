@@ -12,6 +12,7 @@ import inventoryRoutes from './routes/inventory.routes';
 import notificationsRoutes from './routes/notifications.routes';
 import searchRoutes from './routes/search.routes';
 import helpRoutes from './routes/help.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 
 import { errorMiddleware } from './middleware/error.middleware';
 
@@ -32,6 +33,7 @@ app.use(`${API_PREFIX}/inventory`, inventoryRoutes);
 app.use(`${API_PREFIX}/notifications`, notificationsRoutes);
 app.use(`${API_PREFIX}/search`, searchRoutes);
 app.use(`${API_PREFIX}/help`, helpRoutes);
+app.use(`${API_PREFIX}/dashboard`, dashboardRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {

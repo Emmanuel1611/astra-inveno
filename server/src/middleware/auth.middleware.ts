@@ -1,41 +1,43 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../app';
+import prisma from "../app"
 
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
+// Extend Request type to include user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        role: string;
+      };
+    }
+  }
 }
 
-export const authMiddleware = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      return res.status(401).json({ error: 'Access denied. No token provided.' });
+    // Get the token from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
     
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
-      select: { id: true, email: true, role: true, isActive: true }
-    });
-
-    if (!user || !user.isActive) {
-      return res.status(401).json({ error: 'Invalid token or inactive user.' });
-    }
-
-    req.user = user;
-    return next();
+    const token = authHeader.split(' ')[1];
+    
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as {
+      id: string;
+      email: string;
+      role: string;
+    };
+    
+    // Add user info to request object
+    req.user = decoded;
+    
+    next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid token.' });
+    console.error('Auth middleware error:', error);
+    return res.status(401).json({ error: 'Invalid or expired token' });
   }
 };

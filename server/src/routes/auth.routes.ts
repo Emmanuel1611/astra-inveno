@@ -1,18 +1,11 @@
-import { Router } from 'express';
+import express from 'express';
+import { register, login, me} from '../controllers/auth.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
-import { getCurrentUser, logout } from '../controllers/auth.controller';
 
-const router = Router();
+const router = express.Router();
 
-// authentication route
-router.post('/login', (req, res) => {
-  //use req.body to access login data
-  const { username } = req.body;
-  res.send(`Login route for user: ${username}`);
-});
-
-// Add these routes to your existing auth routes
-router.get('/me', authMiddleware, getCurrentUser);
-router.post('/logout', authMiddleware, logout);
+router.post('/register', register);
+router.post('/login', login);
+router.get('/me', authMiddleware, me);
 
 export default router;

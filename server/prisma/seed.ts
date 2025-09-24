@@ -22,7 +22,7 @@ async function main() {
     }
   });
 
-  console.log('👤 Created admin user:', adminUser.email);
+  console.log(' Created admin user:', adminUser.email);
 
   // Create default warehouses
   const mainWarehouse = await prisma.warehouse.upsert({
@@ -78,7 +78,7 @@ async function main() {
     }
   });
 
-  console.log('📂 Created categories:', electronics.name, office.name);
+  console.log(' Created categories:', electronics.name, office.name);
 
   // Create sample items
   const laptop = await prisma.item.upsert({
@@ -149,7 +149,7 @@ async function main() {
     skipDuplicates: true
   });
 
-  console.log('📊 Created initial stock levels');
+  console.log(' Created initial stock levels');
 
   // Create sample customers and suppliers
   const customer = await prisma.customer.upsert({
@@ -182,8 +182,8 @@ async function main() {
     }
   });
 
-  console.log('🤝 Created customer and supplier');
-  console.log('✅ Database seed completed successfully!');
+  console.log(' Created customer and supplier');
+  console.log(' Database seed completed successfully!');
 }
 
 main()
@@ -191,7 +191,7 @@ main()
     await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error('❌ Seed failed:', e);
+    console.error(' Seed failed:', e);
     await prisma.$disconnect();
     process.exit(1);
   });
