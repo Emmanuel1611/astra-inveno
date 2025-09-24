@@ -225,7 +225,7 @@ const Dashboard = () => {
     <div className="mt-[50px] pb-6 px-4">
       <DashboardHeader
         greeting={greeting}
-        userName={userLoading ? "..." : (user ? user.firstName : "User")}
+        userName={userLoading ? "..." : (user ? `${user.firstName}` : "User")}
         organization={userLoading ? "..." : (user?.organization?.name || "Organization")}
       />
       

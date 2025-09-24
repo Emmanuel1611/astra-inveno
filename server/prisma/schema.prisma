@@ -46,16 +46,19 @@ enum UserRole {
 
 // Organization
 model Organization {
-  id        String  @id @default(cuid())
+  id        String  @id @default(uuid())
   name      String
   address   String?
   city      String?
   country   String?
+  logo      String?  // Add this field
+  slug      String?  @unique // Add this field with unique constraint
   isActive  Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users User[]
+  // Relations
+  users     User[]
 
   @@map("organizations")
 }

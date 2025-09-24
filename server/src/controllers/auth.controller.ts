@@ -44,8 +44,8 @@ export const me = async (req: AuthenticatedRequest, res: Response) => {
           ? {
               id: user.organization.id,
               name: user.organization.name,
-              logo: user.organization.logo,
-              slug: user.organization.slug
+              logo: user.organization.logo || null, // Handle nullable logo
+              slug: user.organization.slug || null  // Handle possibly undefined slug
             } 
           : null
       }
@@ -119,4 +119,3 @@ export const logout = async (req: AuthenticatedRequest, res: Response) => {
 
 export const register = async (_req: Request, _res: Response): Promise<void> => { /* ... */ };
 export const login = async (_req: Request, _res: Response): Promise<void> => { /* ... */ };
-export const me = async (_req: Request, _res: Response): Promise<void> => { /* ... */ };
