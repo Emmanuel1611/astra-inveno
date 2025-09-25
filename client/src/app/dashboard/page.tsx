@@ -165,17 +165,7 @@ const Dashboard = () => {
         setLoading(true);
         setError(null);
 
-        const [
-          trendsData,
-          categoriesData,
-          channelsData,
-          topProductsData,
-          lowStockData,
-          receivablesData,
-          activityData,
-          customerMetricsData,
-          fulfillmentMetricsData
-        ] = await Promise.all([
+        const results = await Promise.allSettled([
           fetch(`/api/v1/dashboard/trends?range=${range}&warehouse=${warehouse}&channel=${channel}`).then(res => res.json()),
           fetch(`/api/v1/dashboard/categories?range=${range}`).then(res => res.json()),
           fetch(`/api/v1/dashboard/channels?range=${range}`).then(res => res.json()),
@@ -187,15 +177,60 @@ const Dashboard = () => {
           fetch(`/api/v1/dashboard/fulfillment-metrics`).then(res => res.json())
         ]);
 
-        setTrends(trendsData);
-        setCategories(categoriesData);
-        setChannels(channelsData);
-        setTopProducts(topProductsData);
-        setLowStock(lowStockData);
-        setReceivables(receivablesData);
-        setActivity(activityData);
-        setCustomerMetrics(customerMetricsData);
-        setFulfillmentMetrics(fulfillmentMetricsData);
+        // Process results - each result is either {status: "fulfilled", value: ...} or {status: "rejected", reason: ...}
+        if (results[0].status === 'fulfilled') {
+          setTrends(results[0].value);
+        } else {
+          console.error('Failed to load trends:', results[0].reason);
+        }
+        
+        if (results[1].status === 'fulfilled') {
+          setCategories(results[1].value);
+        } else {
+          console.error('Failed to load categories:', results[1].reason);
+        }
+        
+        if (results[2].status === 'fulfilled') {
+          setChannels(results[2].value);
+        } else {
+          console.error('Failed to load channels:', results[2].reason);
+        }
+        
+        if (results[3].status === 'fulfilled') {
+          setTopProducts(results[3].value);
+        } else {
+          console.error('Failed to load top products:', results[3].reason);
+        }
+        
+        if (results[4].status === 'fulfilled') {
+          setLowStock(results[4].value);
+        } else {
+          console.error('Failed to load low stock items:', results[4].reason);
+        }
+        
+        if (results[5].status === 'fulfilled') {
+          setReceivables(results[5].value);
+        } else {
+          console.error('Failed to load receivables:', results[5].reason);
+        }
+        
+        if (results[6].status === 'fulfilled') {
+          setActivity(results[6].value);
+        } else {
+          console.error('Failed to load activity:', results[6].reason);
+        }
+        
+        if (results[7].status === 'fulfilled') {
+          setCustomerMetrics(results[7].value);
+        } else {
+          console.error('Failed to load customer metrics:', results[7].reason);
+        }
+        
+        if (results[8].status === 'fulfilled') {
+          setFulfillmentMetrics(results[8].value);
+        } else {
+          console.error('Failed to load fulfillment metrics:', results[8].reason);
+        }
       } catch (err) {
         console.error("Error fetching dashboard data", err);
         setError("Failed to load dashboard data. Please try again later.");
