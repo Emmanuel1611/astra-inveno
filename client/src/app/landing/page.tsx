@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { 
-  ShoppingCartIcon, 
-  ChartBarIcon, 
+import {
+  ShoppingCartIcon,
+  ChartBarIcon,
   BuildingStorefrontIcon,
   ClockIcon,
   ShieldCheckIcon,
@@ -39,7 +39,7 @@ export default function LandingPage() {
           </div>
           <span className="font-bold text-xl text-gray-900">Astra Inventory</span>
         </div>
-        
+
         <nav className="hidden lg:flex space-x-8 text-sm font-medium text-gray-700">
           <Link href="/features" className="hover:text-blue-600 transition-colors">
             Features
@@ -54,7 +54,7 @@ export default function LandingPage() {
             FAQ
           </Link>
         </nav>
-        
+
         <div className="flex items-center space-x-3">
           <Link
             href="/login"
@@ -74,7 +74,7 @@ export default function LandingPage() {
       {/* HERO SECTION */}
       <section className="relative px-6 lg:px-8 pt-24 pb-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
         <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] -z-10"></div>
-        
+
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -87,7 +87,7 @@ export default function LandingPage() {
                 <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
                 Trusted by 1,000+ businesses worldwide
               </div>
-              
+
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
                 Smart Inventory
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
@@ -95,12 +95,12 @@ export default function LandingPage() {
                 </span>
                 <br />Made Simple
               </h1>
-              
+
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Transform your business with our comprehensive inventory management platform. 
+                Transform your business with our comprehensive inventory management platform.
                 Track stock, manage orders, and gain powerful insights—all in one place.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <Link
                   href="/signup"
@@ -116,7 +116,7 @@ export default function LandingPage() {
                   Explore Features
                 </Link>
               </div>
-              
+
               <div className="flex items-center space-x-6 text-sm text-gray-600">
                 <div className="flex items-center">
                   <CheckIcon className="w-5 h-5 text-green-500 mr-2" />
@@ -128,7 +128,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </motion.div>
-            
+
             <motion.div
               initial={{ x: 60, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -136,9 +136,9 @@ export default function LandingPage() {
               className="relative"
             >
               <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-8 border">
-                <img 
-                  src="./Inventory-Management.png" 
-                  alt="Astra Inventory Dashboard" 
+                <img
+                  src="./Inventory-Management.png"
+                  alt="Astra Inventory Dashboard"
                   className="w-full rounded-lg"
                 />
               </div>
@@ -164,7 +164,7 @@ export default function LandingPage() {
               From small businesses to enterprise operations, Astra scales with your needs
             </p>
           </motion.div>
-          
+
           <motion.div
             variants={staggerContainer}
             initial="initial"
@@ -242,7 +242,7 @@ export default function LandingPage() {
               See what our customers have to say about Astra Inventory
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
@@ -307,17 +307,17 @@ export default function LandingPage() {
               Choose the perfect plan for your business needs
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
                 name: "Starter",
-                price: "$29",
+                price: "UGX 189,000",
                 period: "/month",
                 description: "Perfect for small businesses just getting started",
                 features: [
                   "Up to 1,000 products",
-                  "2 warehouse locations", 
+                  "2 warehouse locations",
                   "Basic reporting",
                   "Email support",
                   "Mobile app access"
@@ -326,7 +326,7 @@ export default function LandingPage() {
               },
               {
                 name: "Professional",
-                price: "$79",
+                price: "UGX 259,000",
                 period: "/month",
                 description: "Ideal for growing businesses with advanced needs",
                 features: [
@@ -361,11 +361,10 @@ export default function LandingPage() {
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative p-8 rounded-2xl border-2 ${
-                  plan.popular 
-                    ? 'border-blue-500 shadow-lg scale-105' 
-                    : 'border-gray-200 hover:border-gray-300'
-                } transition-all duration-300`}
+                className={`relative p-8 rounded-2xl border-2 ${plan.popular
+                  ? 'border-blue-500 shadow-lg scale-105'
+                  : 'border-gray-200 hover:border-gray-300'
+                  } transition-all duration-300`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -374,7 +373,7 @@ export default function LandingPage() {
                     </span>
                   </div>
                 )}
-                
+
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                   <p className="text-gray-600 mb-4">{plan.description}</p>
@@ -383,7 +382,7 @@ export default function LandingPage() {
                     <span className="text-gray-600 ml-1">{plan.period}</span>
                   </div>
                 </div>
-                
+
                 <ul className="space-y-4 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center">
@@ -392,14 +391,13 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                
+
                 <Link
                   href="/signup"
-                  className={`block w-full text-center py-3 px-6 rounded-lg font-semibold transition-colors ${
-                    plan.popular
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                  }`}
+                  className={`block w-full text-center py-3 px-6 rounded-lg font-semibold transition-colors ${plan.popular
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    }`}
                 >
                   {plan.name === 'Enterprise' ? 'Contact Sales' : 'Start Free Trial'}
                 </Link>
@@ -456,7 +454,7 @@ export default function LandingPage() {
                 The most comprehensive inventory management solution for modern businesses.
               </p>
             </div>
-            
+
             <div>
               <h4 className="font-semibold text-white mb-4">Product</h4>
               <ul className="space-y-2">
@@ -466,17 +464,16 @@ export default function LandingPage() {
                 <li><Link href="/api" className="hover:text-white transition-colors">API</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2">
                 <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
                 <li><Link href="/careers" className="hover:text-white transition-colors">Careers</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold text-white mb-4">Support</h4>
               <ul className="space-y-2">
@@ -487,22 +484,11 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400">
+
+          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-center items-center">
+            <p className="text-gray-400 text-center">
               &copy; 2025 Astra Inventory Management. All rights reserved.
             </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/cookies" className="text-gray-400 hover:text-white transition-colors">
-                Cookie Policy
-              </Link>
-            </div>
           </div>
         </div>
       </footer>

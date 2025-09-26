@@ -35,11 +35,9 @@ const SidebarLink = ({ href, icon: Icon, label, isCollapsed }: SidebarLinkProps)
   return (
     <Link href={href}>
       <div
-        className={`cursor-pointer flex items-center ${
-          isCollapsed ? "justify-center py-4" : "justify-start px-8 py-4"
-        } hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
-          isActive ? "bg-blue-200 text-white" : ""
-        }`}
+        className={`cursor-pointer flex items-center ${isCollapsed ? "justify-center py-4" : "justify-start px-8 py-4"
+          } hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${isActive ? "bg-blue-200 text-white" : ""
+          }`}
       >
         <Icon className="w-6 h-6 !text-gray-700" />
         <span
@@ -60,9 +58,8 @@ const Sidebar = () => {
 
   const sidebarWidth = isSidebarCollapsed ? 60 : 240;
 
-  const sidebarClassNames = `fixed flex flex-col ${
-    isSidebarCollapsed ? "w-16" : "w-60"
-  } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
+  const sidebarClassNames = `fixed flex flex-col ${isSidebarCollapsed ? "w-16" : "w-60"
+    } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
   // Subscription state
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
@@ -104,9 +101,8 @@ const Sidebar = () => {
     <div className={sidebarClassNames} style={{ width: sidebarWidth }}>
       {/* Logo */}
       <div
-        className={`flex gap-3 items-center pt-8 ${
-          isSidebarCollapsed ? "justify-center" : "px-8"
-        }`}
+        className={`flex gap-3 items-center pt-8 ${isSidebarCollapsed ? "justify-center" : "px-8"
+          }`}
       >
         <Image
           src="/2.png"
@@ -133,9 +129,8 @@ const Sidebar = () => {
         <div>
           <button
             onClick={() => toggleDropdown("inventory")}
-            className={`w-full flex items-center ${
-              isSidebarCollapsed ? "justify-center py-4" : "justify-between px-8 py-4"
-            } hover:bg-blue-100 transition-colors`}
+            className={`w-full flex items-center ${isSidebarCollapsed ? "justify-center py-4" : "justify-between px-8 py-4"
+              } hover:bg-blue-100 transition-colors`}
           >
             <div className="flex items-center gap-3">
               <Package className="w-6 h-6 !text-gray-700" />
@@ -164,9 +159,8 @@ const Sidebar = () => {
         <div>
           <button
             onClick={() => toggleDropdown("sales")}
-            className={`w-full flex items-center ${
-              isSidebarCollapsed ? "justify-center py-4" : "justify-between px-8 py-4"
-            } hover:bg-blue-100 transition-colors`}
+            className={`w-full flex items-center ${isSidebarCollapsed ? "justify-center py-4" : "justify-between px-8 py-4"
+              } hover:bg-blue-100 transition-colors`}
           >
             <div className="flex items-center gap-3">
               <ShoppingCart className="w-6 h-6 !text-gray-700" />
@@ -194,9 +188,8 @@ const Sidebar = () => {
         <div>
           <button
             onClick={() => toggleDropdown("purchases")}
-            className={`w-full flex items-center ${
-              isSidebarCollapsed ? "justify-center py-4" : "justify-between px-8 py-4"
-            } hover:bg-blue-100 transition-colors`}
+            className={`w-full flex items-center ${isSidebarCollapsed ? "justify-center py-4" : "justify-between px-8 py-4"
+              } hover:bg-blue-100 transition-colors`}
           >
             <div className="flex items-center gap-3">
               <Truck className="w-6 h-6 !text-gray-700" />
@@ -235,51 +228,8 @@ const Sidebar = () => {
         />
       </div>
 
-      {/* Footer */}
-      {!isSidebarCollapsed && (
-        <div className="mt-auto px-3 pb-4">
-          <div className="rounded-md border border-gray-200 bg-white shadow-sm p-3">
-            {loading ? (
-              <p className="text-xs text-gray-400 animate-pulse">Checking subscription...</p>
-            ) : (
-              <>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    {daysLeft === 0 ? (
-                      <AlertTriangle className="w-4 h-4 text-red-500" />
-                    ) : (
-                      <Clock className="w-4 h-4 text-gray-500" />
-                    )}
-                    <span className="text-sm font-medium text-gray-700">
-                      {daysLeft && daysLeft > 0 ? `${daysLeft} days left` : "Expired"}
-                    </span>
-                  </div>
-                  <a
-                    href="https://payment-gateway-link.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`text-xs font-semibold px-2.5 py-1 rounded-md shadow-sm transition 
-                      ${daysLeft && daysLeft > 0
-                        ? "bg-blue-600 hover:bg-blue-700 text-white"
-                        : "bg-red-500 hover:bg-red-600 text-white"}`}
-                  >
-                    {daysLeft && daysLeft > 0 ? "Renew" : "Subscribe"}
-                  </a>
-                </div>
-                {daysLeft !== null && daysLeft > 0 && (
-                  <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-1.5 bg-blue-500 transition-all duration-500"
-                      style={{ width: `${Math.min((daysLeft / 30) * 100, 100)}%` }}
-                    ></div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-          <p className="mt-3 text-[10px] text-gray-400 text-center">&copy; 2025 Astra</p>
-        </div>
-      )}
+
+
     </div>
   );
 };

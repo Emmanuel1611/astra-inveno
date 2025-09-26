@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import PublicNavbar from "@/components/PublicNavbar";
 import { 
   Package, 
   ShoppingCart, 
@@ -128,6 +129,8 @@ const staggerContainer = {
 export default function FeaturesPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicNavbar />
+      
       {/* Header Section */}
       <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 text-center">

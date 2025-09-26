@@ -671,12 +671,25 @@ export default function Navbar() {
                   <button className="flex items-center w-full px-4 py-2 hover:bg-gray-50 text-sm">
                     My Account
                   </button>
-                  <button className="flex items-center w-full px-4 py-2 hover:bg-gray-50 text-sm">
-                    Subscriptions
-                  </button>
-                  <button className="flex items-center w-full px-4 py-2 hover:bg-gray-50 text-sm">
-                    Settings
-                  </button>
+                    <button className="flex items-center w-full px-4 py-2 hover:bg-gray-50 text-sm">
+                      Subscriptions
+                    </button>
+                    <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                      <button
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-md 
+               bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm 
+               transition-colors duration-150"
+                      >
+                        <span>Manage Subscription</span>
+                        <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
+                          Pro
+                        </span>
+                      </button>
+                      <p className="mt-2 text-xs text-gray-500">
+                        Renews on <span className="font-medium">Oct 25, 2025</span>
+                      </p>
+                    </div>
+
                 </div>
 
                 {/* Sign Out */}

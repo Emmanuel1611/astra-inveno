@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import PublicNavbar from "@/components/PublicNavbar";
 import { StarIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 import { BuildingOfficeIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
@@ -173,6 +174,8 @@ const staggerContainer = {
 export default function TestimonialsPage() {
 	return (
 		<div className="min-h-screen bg-white">
+			<PublicNavbar />
+			
 			{/* Header Section */}
 			<section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pt-24 pb-16">
 				<div className="max-w-7xl mx-auto px-6 text-center">
