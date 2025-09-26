@@ -15,6 +15,7 @@ import helpRoutes from './routes/help.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 
 import { errorMiddleware } from './middleware/error.middleware';
+import { authMiddleware, requireAuth } from './middleware/middleware';
 
 const app = express();
 
@@ -23,6 +24,13 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Apply middleware
+app.use(authMiddleware);
+
+// Or apply to specific routes
+app.use('/dashboard', requireAuth);
+app.use('/api/dashboard', requireAuth);
 
 // API Routes
 const API_PREFIX = '/api/v1';

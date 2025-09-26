@@ -1,94 +1,101 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seed...');
+  console.log('🌱 Seeding database...');
 
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 12);
-  
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@inventory.com' },
-    update: {},
-    create: {
-      email: 'admin@inventory.com',
-      username: 'admin',
+  // Create default organization
+  const organization = await prisma.organization.create({
+    data: {
+      name: 'Default Organization',
+    },
+  });
+
+  // Create default subscription
+  await prisma.subscription.create({
+    data: {
+      organizationId: organization.id,
+      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+      status: 'active',
+    },
+  });
+
+  // Hash password for default users
+  const hashedPassword = await bcrypt.hash('admin123', 10);
+
+  // Create default admin user
+  const adminUser = await prisma.user.create({
+    data: {
+      email: 'admin@system.com',
       password: hashedPassword,
       firstName: 'System',
-      lastName: 'Administrator',
-      role: 'ADMIN'
-    }
+      lastName: 'Admin',
+      role: 'admin',
+      organizationId: organization.id,
+    },
   });
 
-  console.log(' Created admin user:', adminUser.email);
+  // Create default user
+  const defaultUser = await prisma.user.create({
+    data: {
+      email: 'user@system.com',
+      password: hashedPassword,
+      firstName: 'Default',
+      lastName: 'User',
+      role: 'user',
+      organizationId: organization.id,
+    },
+  });
 
-  // Create default warehouses
-  const mainWarehouse = await prisma.warehouse.upsert({
-    where: { code: 'MAIN' },
-    update: {},
-    create: {
+  // Create warehouses
+  const mainWarehouse = await prisma.warehouse.create({
+    data: {
       name: 'Main Warehouse',
-      code: 'MAIN',
-      address: '123 Main Street',
-      city: 'Business City',
-      state: 'State',
-      country: 'Country',
+      code: 'MAIN-001',
+      address: '123 Warehouse St',
+      city: 'Industrial City',
+      state: 'CA',
+      country: 'USA',
       zipCode: '12345',
-      description: 'Primary warehouse location'
-    }
+    },
   });
 
-  const secondaryWarehouse = await prisma.warehouse.upsert({
-    where: { code: 'SEC' },
-    update: {},
-    create: {
+  const secondaryWarehouse = await prisma.warehouse.create({
+    data: {
       name: 'Secondary Warehouse',
-      code: 'SEC',
-      address: '456 Secondary Avenue',
-      city: 'Business City',
-      state: 'State', 
-      country: 'Country',
-      zipCode: '12346',
-      description: 'Secondary storage location'
-    }
+      code: 'SEC-001',
+      address: '456 Storage Ave',
+      city: 'Storage City',
+      state: 'TX',
+      country: 'USA',
+      zipCode: '67890',
+    },
   });
-
-  console.log('🏭 Created warehouses:', mainWarehouse.name, secondaryWarehouse.name);
 
   // Create categories
-  const electronics = await prisma.category.upsert({
-    where: { id: 'electronics-id' },
-    update: {},
-    create: {
-      id: 'electronics-id',
+  const electronicsCategory = await prisma.category.create({
+    data: {
       name: 'Electronics',
-      description: 'Electronic devices and components'
-    }
+      description: 'Electronic devices and components',
+    },
   });
 
-  const office = await prisma.category.upsert({
-    where: { id: 'office-id' },
-    update: {},
-    create: {
-      id: 'office-id',
-      name: 'Office Supplies',
-      description: 'Office and business supplies'
-    }
+  const clothingCategory = await prisma.category.create({
+    data: {
+      name: 'Clothing',
+      description: 'Apparel and accessories',
+    },
   });
 
-  console.log(' Created categories:', electronics.name, office.name);
-
-  // Create sample items
-  const laptop = await prisma.item.upsert({
-    where: { sku: 'LAPTOP-001' },
-    update: {},
-    create: {
+  // Create items with proper user references
+  const laptop = await prisma.item.create({
+    data: {
       sku: 'LAPTOP-001',
-      name: 'Business Laptop',
-      description: 'High-performance laptop for business use',
-      categoryId: electronics.id,
+      name: 'Gaming Laptop',
+      description: 'High-performance gaming laptop',
+      categoryId: electronicsCategory.id,
       unitOfMeasure: 'piece',
       costPrice: 800.00,
       sellingPrice: 1200.00,
@@ -96,102 +103,131 @@ async function main() {
       maxStockLevel: 50,
       reorderPoint: 10,
       barcode: '1234567890123',
-      createdById: adminUser.id
-    }
+      createdById: adminUser.id, // Reference the created user
+    },
   });
 
-  const mouse = await prisma.item.upsert({
-    where: { sku: 'MOUSE-001' },
-    update: {},
-    create: {
-      sku: 'MOUSE-001',
-      name: 'Wireless Mouse',
-      description: 'Ergonomic wireless mouse',
-      categoryId: electronics.id,
+  const smartphone = await prisma.item.create({
+    data: {
+      sku: 'PHONE-001',
+      name: 'Smartphone',
+      description: 'Latest model smartphone',
+      categoryId: electronicsCategory.id,
       unitOfMeasure: 'piece',
-      costPrice: 15.00,
-      sellingPrice: 25.00,
+      costPrice: 300.00,
+      sellingPrice: 599.99,
+      minStockLevel: 10,
+      maxStockLevel: 100,
+      reorderPoint: 20,
+      barcode: '1234567890124',
+      createdById: adminUser.id,
+    },
+  });
+
+  const tshirt = await prisma.item.create({
+    data: {
+      sku: 'SHIRT-001',
+      name: 'Cotton T-Shirt',
+      description: 'Comfortable cotton t-shirt',
+      categoryId: clothingCategory.id,
+      unitOfMeasure: 'piece',
+      costPrice: 5.00,
+      sellingPrice: 19.99,
       minStockLevel: 20,
       maxStockLevel: 200,
-      reorderPoint: 30,
-      barcode: '1234567890124',
-      createdById: adminUser.id
-    }
+      reorderPoint: 50,
+      barcode: '1234567890125',
+      createdById: defaultUser.id,
+    },
   });
 
-  console.log('📦 Created items:', laptop.name, mouse.name);
-
-  // Create initial stock in warehouses
+  // Create item-warehouse relationships with stock
   await prisma.itemWarehouse.createMany({
     data: [
       {
         itemId: laptop.id,
         warehouseId: mainWarehouse.id,
         currentStock: 25,
-        reservedStock: 0,
-        availableStock: 25
+        availableStock: 25,
       },
       {
-        itemId: laptop.id,
-        warehouseId: secondaryWarehouse.id,
-        currentStock: 15,
-        reservedStock: 0,
-        availableStock: 15
-      },
-      {
-        itemId: mouse.id,
+        itemId: smartphone.id,
         warehouseId: mainWarehouse.id,
-        currentStock: 100,
-        reservedStock: 0,
-        availableStock: 100
-      }
+        currentStock: 50,
+        availableStock: 45,
+        reservedStock: 5,
+      },
+      {
+        itemId: tshirt.id,
+        warehouseId: secondaryWarehouse.id,
+        currentStock: 150,
+        availableStock: 150,
+      },
     ],
-    skipDuplicates: true
   });
 
-  console.log(' Created initial stock levels');
-
-  // Create sample customers and suppliers
-  const customer = await prisma.customer.upsert({
-    where: { email: 'customer@example.com' },
-    update: {},
-    create: {
-      name: 'Astra Entreprise',
-      email: 'customer@example.com',
-      phone: '+1-555-0123',
-      address: '789 Customer Lane',
+  // Create customers
+  const customer1 = await prisma.customer.create({
+    data: {
+      name: 'John Doe',
+      email: 'john.doe@email.com',
+      phone: '+1234567890',
+      address: '789 Customer St',
       city: 'Customer City',
-      state: 'State',
-      country: 'Country',
-      zipCode: '12347'
-    }
+      state: 'NY',
+      country: 'USA',
+      zipCode: '54321',
+    },
   });
 
-  const supplier = await prisma.supplier.upsert({
-    where: { email: 'supplier@example.com' },
-    update: {},
-    create: {
+  // Create suppliers
+  const supplier1 = await prisma.supplier.create({
+    data: {
       name: 'Tech Supplier Inc',
-      email: 'supplier@example.com',
-      phone: '+1-555-0124',
-      address: '321 Supplier Street',
-      city: 'Supplier City',
-      state: 'State',
-      country: 'Country',
-      zipCode: '12348'
-    }
+      email: 'contact@techsupplier.com',
+      phone: '+9876543210',
+      address: '321 Supplier Blvd',
+      city: 'Supplier Town',
+      state: 'CA',
+      country: 'USA',
+      zipCode: '98765',
+    },
   });
 
-  console.log(' Created customer and supplier');
-  console.log(' Database seed completed successfully!');
+  // Create some inventory movements
+  await prisma.movement.createMany({
+    data: [
+      {
+        type: 'IN',
+        itemId: laptop.id,
+        warehouseId: mainWarehouse.id,
+        quantity: 25,
+        unitCost: 800.00,
+        reference: 'INITIAL-STOCK',
+        referenceType: 'MANUAL',
+        userId: adminUser.id,
+      },
+      {
+        type: 'IN',
+        itemId: smartphone.id,
+        warehouseId: mainWarehouse.id,
+        quantity: 50,
+        unitCost: 300.00,
+        reference: 'INITIAL-STOCK',
+        referenceType: 'MANUAL',
+        userId: adminUser.id,
+      },
+    ],
+  });
+
+  console.log('✅ Database seeded successfully!');
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(' Seed failed:', e);
-    await prisma.$disconnect();
+  .catch((e) => {
+    console.error('❌ Error seeding database:', e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-import DashboardWrapper from "./dashboardWrapper";
+import ConditionalDashboardWrapper from "./ConditionalDashboardWrapper";
 import QueryProvider from "./providers/QueryProvider";
 import { AuthProvider } from '@/context/AuthContext';
 
@@ -32,11 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-
         <QueryProvider>
-          <DashboardWrapper>{children}</DashboardWrapper>
+          <ConditionalDashboardWrapper>{children}</ConditionalDashboardWrapper>
         </QueryProvider>
-
       </body>
     </html>
   );

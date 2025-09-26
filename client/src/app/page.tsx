@@ -1,5 +1,12 @@
-import Dashboard from "@/app/dashboard/page";
+import LandingPage from "@/app/landing/page";
 
 export default function Home() {
-  return <Dashboard />;
+  return <LandingPage />;
 }
+
+
+// import Dashboard from "@/app/dashboard/page";
+
+// export default function Home() {
+//   return <Dashboard />;
+// }
