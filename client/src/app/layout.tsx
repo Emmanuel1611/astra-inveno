@@ -32,11 +32,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <QueryProvider>
-            <DashboardWrapper>{children}</DashboardWrapper>
-          </QueryProvider>
-        </AuthProvider>
+
+        <QueryProvider>
+          <DashboardWrapper>{children}</DashboardWrapper>
+        </QueryProvider>
+
       </body>
     </html>
   );
