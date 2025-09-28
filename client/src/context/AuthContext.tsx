@@ -1,80 +1,76 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { api } from '@/lib/api';
 
-type User = {
+interface User {
   id: string;
-  firstName: string;
-  lastName: string;
   email: string;
-  role: string;
-  avatar?: string | null;
-  organization?: {
-    id: string;
-    name: string;
-    logo?: string | null;
-  } | null;
-};
+  name: string;
+}
 
-type AuthContextType = {
+interface AuthContextType {
   user: User | null;
-  loading: boolean;
-  error: string | null;
-  logout: () => Promise<void>;
-};
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  isLoading: boolean;
+}
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  error: null,
-  logout: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-        
-        const response = await api.get('/auth/me');
-        setUser(response.data.user);
-      } catch (err) {
-        console.error('Error fetching user:', err);
-        setError('Failed to load user information');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCurrentUser();
+    // Check for stored auth token (static simulation)
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      const mockUser = {
+        id: '1',
+        email: 'user@example.com',
+        name: 'Demo User'
+      };
+      setUser(mockUser);
+    }
+    setIsLoading(false);
   }, []);
 
-  const logout = async () => {
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      await api.post('/auth/logout');
-      localStorage.removeItem('authToken');
-      setUser(null);
-      window.location.href = '/login';
-    } catch (err) {
-      console.error('Logout error:', err);
+      // Static authentication - no API calls
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Accept any email/password for demo purposes
+      const mockUser = { id: '1', email, name: 'Demo User' };
+      const mockToken = 'demo-jwt-token';
+      
+      localStorage.setItem('authToken', mockToken);
+      setUser(mockUser);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const logout = () => {
+    // Static logout - no API calls
+    localStorage.removeItem('authToken');
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, error, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

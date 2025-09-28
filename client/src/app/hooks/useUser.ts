@@ -1,36 +1,69 @@
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { useState, useEffect } from 'react';
 
 export interface UserData {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
-  role: string;
-  avatar: string | null;
-  lastLoginAt: string;
-  organization: {
-    id: string;
+  avatar?: string;
+  role?: string;
+  organization?: {
     name: string;
-    logo: string | null;
-    slug: string;
+    id: string;
   };
 }
 
-export function useUser() {
-  const { data, isLoading, error } = useQuery<UserData>({
-    queryKey: ["user-data"],
-    queryFn: async () => {
-      const response = await api.get("/auth/me");
-      return response.data;
-    },
-    staleTime: 5 * 60 * 1000,
-    retry: false,
-  });
+// Static mock user data
+const mockUserData: UserData = {
+  id: '1',
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john.doe@example.com',
+  avatar: '/default-avatar.png',
+  role: 'Admin',
+  organization: {
+    name: 'Demo Company',
+    id: 'org-1'
+  }
+};
+
+export const useUser = () => {
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading user data
+    const timeoutId = setTimeout(() => {
+      // Check if user is logged in (static check)
+      const authToken = localStorage.getItem('authToken');
+      
+      if (authToken) {
+        setUserData(mockUserData);
+      } else {
+        setUserData(null);
+      }
+      
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  const updateUser = (updates: Partial<UserData>) => {
+    if (userData) {
+      setUserData({ ...userData, ...updates });
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('authToken');
+    setUserData(null);
+  };
 
   return {
-    userData: data,  
+    userData,
     isLoading,
-    error,
+    updateUser,
+    logout,
   };
-}
+};

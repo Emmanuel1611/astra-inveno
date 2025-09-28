@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAuth } from '@/context/AuthContext';
 import {
   DollarSign, ShoppingCart, CreditCard, TrendingUp, TrendingDown,
   Package, Users, Clock4, Tag, Building, Calendar, ChevronDown,
@@ -12,6 +11,94 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend, PieChart, Pie, Cell,
 } from "recharts";
+
+/* ---------------------- Static Mock Data ---------------------- */
+const mockUser = {
+  firstName: "John",
+  lastName: "Doe",
+  email: "john.doe@example.com",
+  organization: {
+    name: "Demo Company Ltd"
+  }
+};
+
+const mockTrends = {
+  trends: [
+    { date: "Jan", sales: 45000, purchases: 30000, expenses: 8000 },
+    { date: "Feb", sales: 52000, purchases: 35000, expenses: 9000 },
+    { date: "Mar", sales: 48000, purchases: 32000, expenses: 7500 },
+    { date: "Apr", sales: 61000, purchases: 40000, expenses: 10000 },
+    { date: "May", sales: 55000, purchases: 38000, expenses: 8500 },
+    { date: "Jun", sales: 67000, purchases: 45000, expenses: 11000 },
+  ],
+  totals: {
+    sales: 328000,
+    purchases: 220000,
+    expenses: 54000,
+  },
+  changes: {
+    sales: "+12.5",
+    purchases: "+8.3",
+    expenses: "-5.2",
+    margin: "+15.8",
+  },
+  dateRange: {
+    start: "Jan 1, 2024",
+    end: "Jun 30, 2024"
+  }
+};
+
+const mockCategories = [
+  { category: "Electronics", amount: 120000 },
+  { category: "Furniture", amount: 85000 },
+  { category: "Office Supplies", amount: 65000 },
+  { category: "Software", amount: 45000 },
+  { category: "Hardware", amount: 35000 },
+];
+
+const mockChannels = [
+  { name: "Online", value: 45 },
+  { name: "Retail", value: 30 },
+  { name: "Wholesale", value: 25 },
+];
+
+const mockTopProducts = [
+  { name: "MacBook Pro", sku: "MBP-001", sold: 45, revenue: 135000 },
+  { name: "Office Chair", sku: "OFC-002", sold: 120, revenue: 96000 },
+  { name: "Wireless Mouse", sku: "WM-003", sold: 200, revenue: 24000 },
+  { name: "Monitor 27''", sku: "MON-004", sold: 85, revenue: 85000 },
+  { name: "Keyboard", sku: "KB-005", sold: 150, revenue: 22500 },
+];
+
+const mockLowStock = [
+  { name: "Laptop Charger", sku: "LC-001", qty: 5, reorder: 20 },
+  { name: "USB Cable", sku: "USB-002", qty: 8, reorder: 25 },
+  { name: "Power Bank", sku: "PB-003", qty: 3, reorder: 15 },
+];
+
+const mockReceivables = [
+  { id: "INV-001", customer: "ABC Corp", amount: 15000, dueIn: 5 },
+  { id: "INV-002", customer: "XYZ Ltd", amount: 22000, dueIn: 12 },
+  { id: "INV-003", customer: "Tech Solutions", amount: 8500, dueIn: 18 },
+];
+
+const mockActivity = [
+  { text: "Order #1234 shipped to ABC Corp", ts: "2 mins ago", icon: "truck" },
+  { text: "Payment received from XYZ Ltd", ts: "15 mins ago", icon: "credit-card" },
+  { text: "New order #1235 created", ts: "1 hour ago", icon: "check" },
+  { text: "Low stock alert: USB Cables", ts: "2 hours ago", icon: "alert" },
+];
+
+const mockCustomerMetrics = {
+  newCustomers: { count: 24, change: 15.2, increasing: true },
+  openOrders: { count: 156, change: 8.7, increasing: true },
+};
+
+const mockFulfillmentMetrics = {
+  readyToShip: 45,
+  inTransit: 23,
+  delivered: 187,
+};
 
 /* ---------------------- Skeleton Components ---------------------- */
 const KpiSkeleton = () => (
@@ -138,7 +225,10 @@ function SectionCard({ title, actions, children }: any) {
 
 /* ---------------------- Main Dashboard ---------------------- */
 const Dashboard = () => {
-  const { user, loading: userLoading } = useAuth(); // Get user from context
+  // Static user data instead of using auth context
+  const [user] = useState(mockUser);
+  const [userLoading] = useState(false);
+  
   const [range, setRange] = useState("30D");
   const [warehouse, setWarehouse] = useState("all");
   const [channel, setChannel] = useState("all");
@@ -146,100 +236,26 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [trends, setTrends] = useState<any>({ trends: [], totals: {}, changes: {}, dateRange: {} });
-  const [categories, setCategories] = useState<any[]>([]);
-  const [channels, setChannels] = useState<any[]>([]);
-  const [topProducts, setTopProducts] = useState<any[]>([]);
-  const [lowStock, setLowStock] = useState<any[]>([]);
-  const [receivables, setReceivables] = useState<any[]>([]);
-  const [activity, setActivity] = useState<any[]>([]);
-  const [customerMetrics, setCustomerMetrics] = useState<any>({ newCustomers: {}, openOrders: {} });
-  const [fulfillmentMetrics, setFulfillmentMetrics] = useState<any>({});
+  // Static data state
+  const [trends] = useState(mockTrends);
+  const [categories] = useState(mockCategories);
+  const [channels] = useState(mockChannels);
+  const [topProducts] = useState(mockTopProducts);
+  const [lowStock] = useState(mockLowStock);
+  const [receivables] = useState(mockReceivables);
+  const [activity] = useState(mockActivity);
+  const [customerMetrics] = useState(mockCustomerMetrics);
+  const [fulfillmentMetrics] = useState(mockFulfillmentMetrics);
 
   const COLORS = ["#6366F1", "#22C55E", "#F59E0B", "#EC4899", "#0EA5E9"];
 
-  // Fetch dashboard data
+  // Simulate loading for better UX
   useEffect(() => {
-    async function fetchDashboard() {
-      try {
-        setLoading(true);
-        setError(null);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500); // 1.5 second loading simulation
 
-        const results = await Promise.allSettled([
-          fetch(`/api/v1/dashboard/trends?range=${range}&warehouse=${warehouse}&channel=${channel}`).then(res => res.json()),
-          fetch(`/api/v1/dashboard/categories?range=${range}`).then(res => res.json()),
-          fetch(`/api/v1/dashboard/channels?range=${range}`).then(res => res.json()),
-          fetch(`/api/v1/dashboard/top-products?range=${range}`).then(res => res.json()),
-          fetch(`/api/v1/dashboard/low-stock`).then(res => res.json()),
-          fetch(`/api/v1/dashboard/receivables`).then(res => res.json()),
-          fetch(`/api/v1/dashboard/activity?limit=4`).then(res => res.json()),
-          fetch(`/api/v1/dashboard/customer-metrics`).then(res => res.json()),
-          fetch(`/api/v1/dashboard/fulfillment-metrics`).then(res => res.json())
-        ]);
-
-        // Process results - each result is either {status: "fulfilled", value: ...} or {status: "rejected", reason: ...}
-        if (results[0].status === 'fulfilled') {
-          setTrends(results[0].value);
-        } else {
-          console.error('Failed to load trends:', results[0].reason);
-        }
-        
-        if (results[1].status === 'fulfilled') {
-          setCategories(results[1].value);
-        } else {
-          console.error('Failed to load categories:', results[1].reason);
-        }
-        
-        if (results[2].status === 'fulfilled') {
-          setChannels(results[2].value);
-        } else {
-          console.error('Failed to load channels:', results[2].reason);
-        }
-        
-        if (results[3].status === 'fulfilled') {
-          setTopProducts(results[3].value);
-        } else {
-          console.error('Failed to load top products:', results[3].reason);
-        }
-        
-        if (results[4].status === 'fulfilled') {
-          setLowStock(results[4].value);
-        } else {
-          console.error('Failed to load low stock items:', results[4].reason);
-        }
-        
-        if (results[5].status === 'fulfilled') {
-          setReceivables(results[5].value);
-        } else {
-          console.error('Failed to load receivables:', results[5].reason);
-        }
-        
-        if (results[6].status === 'fulfilled') {
-          setActivity(results[6].value);
-        } else {
-          console.error('Failed to load activity:', results[6].reason);
-        }
-        
-        if (results[7].status === 'fulfilled') {
-          setCustomerMetrics(results[7].value);
-        } else {
-          console.error('Failed to load customer metrics:', results[7].reason);
-        }
-        
-        if (results[8].status === 'fulfilled') {
-          setFulfillmentMetrics(results[8].value);
-        } else {
-          console.error('Failed to load fulfillment metrics:', results[8].reason);
-        }
-      } catch (err) {
-        console.error("Error fetching dashboard data", err);
-        setError("Failed to load dashboard data. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDashboard();
+    return () => clearTimeout(timer);
   }, [range, warehouse, channel]);
 
   // Update greeting based on time of day
@@ -260,8 +276,8 @@ const Dashboard = () => {
     <div className="mt-[50px] pb-6 px-4">
       <DashboardHeader
         greeting={greeting}
-        userName={userLoading ? "..." : (user ? `${user.firstName}` : "User")}
-        organization={userLoading ? "..." : (user?.organization?.name || "Organization")}
+        userName={userLoading ? "..." : user.firstName}
+        organization={userLoading ? "..." : user.organization.name}
       />
       
       {error ? (
@@ -278,47 +294,53 @@ const Dashboard = () => {
       ) : (
         <div className="space-y-6">
           {/* Toolbar */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  className={`rounded-full px-3 py-1.5 text-sm ${range === "7D" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setRange("7D")}
-                >
-                  Last 7 days
-                </button>
-                <button
-                  className={`rounded-full px-3 py-1.5 text-sm ${range === "30D" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setRange("30D")}
-                >
-                  Last 30 days
-                </button>
-                <button
-                  className={`rounded-full px-3 py-1.5 text-sm ${range === "QTD" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setRange("QTD")}
-                >
-                  Quarter-to-date
-                </button>
-                <button
-                  className={`rounded-full px-3 py-1.5 text-sm ${range === "YTD" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-                  onClick={() => setRange("YTD")}
-                >
-                  Year-to-date
-                </button>
+          <div className="rounded-xl border border-gray-200 bg-white px-4 py-2 shadow-sm">
+            <div className="flex items-center justify-between gap-4 overflow-x-auto scrollbar-hide">
+              
+              {/* Left: Range Buttons */}
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {["7D", "30D", "QTD", "YTD", "CUSTOM"].map((key) => (
+                  <button
+                    key={key}
+                    className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition 
+                      ${
+                        range === key
+                          ? "bg-blue-600 text-white shadow-sm"
+                          : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    onClick={() => setRange(key)}
+                  >
+                    {key === "7D"
+                      ? "Last 7 days"
+                      : key === "30D"
+                      ? "Last 30 days"
+                      : key === "QTD"
+                      ? "Quarter-to-date"
+                      : key === "YTD"
+                      ? "Year-to-date"
+                      : "Custom Range"}
+                  </button>
+                ))}
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-700">
-                    {loading ? "Loading..." : `${trends.dateRange?.start} — ${trends.dateRange?.end}`}
+              {/* Right: Filters + Export */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Date Display */}
+                <div className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs hover:border-blue-400 transition cursor-pointer">
+                  <Calendar className="h-3.5 w-3.5 text-gray-500" />
+                  <span className="text-gray-700 whitespace-nowrap">
+                    {loading
+                      ? "Loading..."
+                      : `${trends.dateRange?.start} — ${trends.dateRange?.end}`}
                   </span>
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                  <ChevronDown className="h-3.5 w-3.5 text-gray-500" />
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm">
-                  <Filter className="h-4 w-4 text-gray-500" />
+
+                {/* Warehouse Filter */}
+                <div className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs hover:border-blue-400 transition">
+                  <Filter className="h-3.5 w-3.5 text-gray-500" />
                   <select
-                    className="bg-white text-indigo-600 focus:outline-none"
+                    className="bg-transparent text-gray-700 focus:outline-none text-xs"
                     value={warehouse}
                     onChange={(e) => setWarehouse(e.target.value)}
                     disabled={loading}
@@ -329,10 +351,12 @@ const Dashboard = () => {
                     <option value="3">Mbarara Hub</option>
                   </select>
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm">
-                  <Tag className="h-4 w-4 text-gray-500" />
+
+                {/* Channel Filter */}
+                <div className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs hover:border-blue-400 transition">
+                  <Tag className="h-3.5 w-3.5 text-gray-500" />
                   <select
-                    className="bg-white text-indigo-600 focus:outline-none"
+                    className="bg-transparent text-gray-700 focus:outline-none text-xs"
                     value={channel}
                     onChange={(e) => setChannel(e.target.value)}
                     disabled={loading}
@@ -343,8 +367,10 @@ const Dashboard = () => {
                     <option value="wholesale">Wholesale</option>
                   </select>
                 </div>
-                <button className="inline-flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1.5 text-sm text-white">
-                  <Download className="h-4 w-4" /> Export
+
+                {/* Export */}
+                <button className="inline-flex items-center gap-1.5 rounded-md bg-gray-950 px-3 py-1.5 text-xs text-white font-medium shadow-sm hover:bg-black transition">
+                  <Download className="h-3.5 w-3.5" /> Export
                 </button>
               </div>
             </div>

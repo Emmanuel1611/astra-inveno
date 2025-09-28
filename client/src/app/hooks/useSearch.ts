@@ -1,72 +1,72 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
 
 export interface SearchResult {
-  [x: string]: string | undefined | number;
   id: string;
-  type: 'item' | 'customer' | 'vendor' | 'order';
-  title: string;
-  subtitle?: string;
-  url: string;
+  name?: string;
+  title?: string;
+  type?: string;
   category?: string;
-  relevanceScore: number;
+  [key: string]: string | undefined | number;
 }
 
-export interface SearchResponse {
-  results: SearchResult[];
-  totalFound: number;
-  query: string;
-}
+// Static mock search data
+const mockSearchData: SearchResult[] = [
+  { id: '1', name: 'Laptop', type: 'product', category: 'Electronics' },
+  { id: '2', name: 'Office Chair', type: 'product', category: 'Furniture' },
+  { id: '3', name: 'Mouse', type: 'product', category: 'Electronics' },
+  { id: '4', name: 'Keyboard', type: 'product', category: 'Electronics' },
+  { id: '5', name: 'Monitor', type: 'product', category: 'Electronics' },
+  { id: '6', name: 'Desk', type: 'product', category: 'Furniture' },
+  { id: '7', title: 'Sales Report', type: 'report', category: 'Reports' },
+  { id: '8', title: 'Inventory Report', type: 'report', category: 'Reports' },
+  { id: '9', name: 'John Doe', type: 'customer', category: 'Contacts' },
+  { id: '10', name: 'ABC Supplier', type: 'vendor', category: 'Contacts' },
+];
 
-export function useSearch() {
+export const useSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    
-    const performSearch = async () => {
-      if (searchQuery.length < 2) {
-        setSearchResults([]);
-        setError(null);
-        return;
-      }
-
+    if (searchQuery.trim().length > 0) {
       setIsSearching(true);
-      setError(null);
       
-      try {
-        const response = await api.get('/search', { 
-          params: { q: searchQuery, limit: 8 } 
+      // Simulate API delay
+      const timeoutId = setTimeout(() => {
+        // Static search implementation - filter mock data
+        const results = mockSearchData.filter(item => {
+          const searchTerm = searchQuery.toLowerCase();
+          return (
+            (item.name && item.name.toLowerCase().includes(searchTerm)) ||
+            (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+            (item.category && item.category.toLowerCase().includes(searchTerm))
+          );
         });
-        setSearchResults(response.data.results || []);
-      } catch (error: any) {
-        console.error('Search error:', error);
-        setError(error.message || 'Search failed');
-        setSearchResults([]);
-      } finally {
+        
+        setSearchResults(results);
         setIsSearching(false);
-      }
-    };
+      }, 300); // 300ms delay to simulate API call
 
-    const searchTimeout = setTimeout(performSearch, 300);
-
-    return () => {
-      clearTimeout(searchTimeout);
-      controller.abort();
-    };
+      return () => clearTimeout(timeoutId);
+    } else {
+      setSearchResults([]);
+      setIsSearching(false);
+    }
   }, [searchQuery]);
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+  };
 
   return {
     searchQuery,
     setSearchQuery,
     searchResults,
     isSearching,
-    error,
-    clearSearch: () => setSearchQuery(''),
+    clearSearch,
   };
-}
+};

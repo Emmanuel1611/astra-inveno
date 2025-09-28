@@ -53,7 +53,7 @@ const SidebarLink = ({ href, icon: Icon, label, isCollapsed }: SidebarLinkProps)
 const Sidebar = () => {
   const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
+    (state: any) => state.global?.isSidebarCollapsed ?? false
   );
 
   const sidebarWidth = isSidebarCollapsed ? 60 : 240;
@@ -61,30 +61,9 @@ const Sidebar = () => {
   const sidebarClassNames = `fixed flex flex-col ${isSidebarCollapsed ? "w-16" : "w-60"
     } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
-  // Subscription state
-  const [daysLeft, setDaysLeft] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchSubscription() {
-      try {
-        const res = await fetch("/api/subscription");
-        const data = await res.json();
-
-        const expiryDate = new Date(data.expiryDate);
-        const today = new Date();
-        const diffTime = expiryDate.getTime() - today.getTime();
-        const days = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-
-        setDaysLeft(days);
-      } catch (error) {
-        console.error("Error fetching subscription:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchSubscription();
-  }, []);
+  // Static subscription state - no API call
+  const [daysLeft] = useState(15); // Mock 15 days left
+  const [loading] = useState(false);
 
   // Dropdown states
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
@@ -227,9 +206,6 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
       </div>
-
-
-
     </div>
   );
 };

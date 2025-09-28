@@ -9,9 +9,9 @@ import StoreProvider, { useAppSelector } from "./redux";
 const ConditionalDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
+    (state: any) => state.global?.isSidebarCollapsed
   );
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state: any) => state.global?.isDarkMode);
 
   // Routes where you want to show just the content without dashboard components
   const publicRoutes = [
