@@ -1,88 +1,236 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, MoreVertical, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Eye, Edit, Truck, CheckCircle, Clock, FileText } from "lucide-react";
 
-const PurchaseOrdersPage = () => {
-  const [orders] = useState([
-    { id: 1, vendor: "Vendor A", orderNo: "PO-001", date: "2025-08-01", status: "Pending", amount: "$1,200" },
-    { id: 2, vendor: "Vendor B", orderNo: "PO-002", date: "2025-08-05", status: "Approved", amount: "$2,000" },
-    { id: 3, vendor: "Vendor C", orderNo: "PO-003", date: "2025-08-10", status: "Received", amount: "$750" },
-  ]);
+const mockPurchaseOrders = [
+	{
+		id: "PO-001",
+		supplier: "Tech Supplies Inc",
+		items: 5,
+		total: 1299.99,
+		status: "pending",
+		expectedDate: "2024-03-20",
+		orderDate: "2024-03-15",
+	},
+	{
+		id: "PO-002",
+		supplier: "Office World",
+		items: 3,
+		total: 459.5,
+		status: "approved",
+		expectedDate: "2024-03-18",
+		orderDate: "2024-03-14",
+	},
+	{
+		id: "PO-003",
+		supplier: "Electronics Hub",
+		items: 8,
+		total: 2199.25,
+		status: "received",
+		expectedDate: "2024-03-16",
+		orderDate: "2024-03-10",
+	},
+	{
+		id: "PO-004",
+		supplier: "Furniture Plus",
+		items: 2,
+		total: 899.99,
+		status: "cancelled",
+		expectedDate: "2024-03-25",
+		orderDate: "2024-03-12",
+	},
+];
 
-  return (
-    <div className="p-6 min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Purchase Orders</h1>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg shadow bg-blue-600 hover:bg-blue-700 text-white">
-          <Plus size={18} /> New Order
-        </button>
-      </div>
+export default function PurchaseOrders() {
+	const [orders, setOrders] = useState(mockPurchaseOrders);
 
-      {/* Search */}
-      <div className="flex items-center mb-4 w-full md:w-1/3 px-3 py-2 rounded-lg shadow bg-gray-100 dark:bg-gray-800">
-        <Search size={18} className="text-gray-500 dark:text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search orders..."
-          className="ml-2 w-full bg-transparent outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-        />
-      </div>
+	const getStatusColor = (status: string) => {
+		switch (status) {
+			case "pending":
+				return "bg-yellow-100 text-yellow-700";
+			case "approved":
+				return "bg-blue-100 text-blue-700";
+			case "received":
+				return "bg-green-100 text-green-700";
+			case "cancelled":
+				return "bg-red-100 text-red-700";
+			default:
+				return "bg-gray-100 text-gray-700";
+		}
+	};
 
-      {/* Table */}
-      <div className="overflow-x-auto rounded-lg border shadow bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-        <table className="w-full border-collapse">
-          <thead className="bg-gray-100 dark:bg-gray-800">
-            <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Order No</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Vendor</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Date</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Amount</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((o, idx) => (
-              <tr
-                key={o.id}
-                className={`${
-                  idx % 2 === 0
-                    ? "bg-white dark:bg-gray-900"
-                    : "bg-gray-50 dark:bg-gray-800"
-                } hover:bg-gray-100 dark:hover:bg-gray-700 transition`}
-              >
-                <td className="px-4 py-3 text-sm">{o.orderNo}</td>
-                <td className="px-4 py-3 text-sm">{o.vendor}</td>
-                <td className="px-4 py-3 text-sm">{o.date}</td>
-                <td className="px-4 py-3 text-sm">{o.status}</td>
-                <td className="px-4 py-3 text-sm">{o.amount}</td>
-                <td className="px-4 py-3 text-right">
-                  <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <MoreVertical size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+	const getStatusIcon = (status: string) => {
+		switch (status) {
+			case "pending":
+				return <Clock className="w-4 h-4" />;
+			case "approved":
+				return <CheckCircle className="w-4 h-4" />;
+			case "received":
+				return <Truck className="w-4 h-4" />;
+			case "cancelled":
+				return <FileText className="w-4 h-4" />;
+			default:
+				return <Clock className="w-4 h-4" />;
+		}
+	};
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-4">
-        <p className="text-sm text-gray-600 dark:text-gray-400">Showing {orders.length} orders</p>
-        <div className="flex gap-2">
-          <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
-            <ChevronLeft size={18} />
-          </button>
-          <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+	return (
+		<div className="p-6">
+			<div className="flex items-center justify-between mb-6">
+				<div className="flex items-center gap-3">
+					<div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+						<Plus className="w-5 h-5 text-white" />
+					</div>
+					<div>
+						<h1 className="text-2xl font-bold text-gray-900">
+							Purchase Orders
+						</h1>
+						<p className="text-gray-600">Manage supplier orders</p>
+					</div>
+				</div>
 
-export default PurchaseOrdersPage;
+				<button className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg hover:from-red-600 hover:to-red-700 transition-colors">
+					<Plus className="w-4 h-4" />
+					Create Order
+				</button>
+			</div>
+
+			{/* Stats Cards */}
+			<div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+				<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+					<div className="flex items-center gap-4">
+						<div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+							<Clock className="w-6 h-6 text-yellow-600" />
+						</div>
+						<div>
+							<div className="text-2xl font-bold text-gray-900">1</div>
+							<div className="text-sm text-gray-600">Pending</div>
+						</div>
+					</div>
+				</div>
+
+				<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+					<div className="flex items-center gap-4">
+						<div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+							<CheckCircle className="w-6 h-6 text-blue-600" />
+						</div>
+						<div>
+							<div className="text-2xl font-bold text-gray-900">1</div>
+							<div className="text-sm text-gray-600">Approved</div>
+						</div>
+					</div>
+				</div>
+
+				<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+					<div className="flex items-center gap-4">
+						<div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+							<Truck className="w-6 h-6 text-green-600" />
+						</div>
+						<div>
+							<div className="text-2xl font-bold text-gray-900">1</div>
+							<div className="text-sm text-gray-600">Received</div>
+						</div>
+					</div>
+				</div>
+
+				<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+					<div className="flex items-center gap-4">
+						<div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+							<FileText className="w-6 h-6 text-purple-600" />
+						</div>
+						<div>
+							<div className="text-2xl font-bold text-gray-900">$4,858</div>
+							<div className="text-sm text-gray-600">Total Value</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+				<div className="px-6 py-4 border-b border-gray-200">
+					<h2 className="text-lg font-semibold text-gray-900">
+						Purchase Orders
+					</h2>
+				</div>
+
+				<div className="overflow-x-auto">
+					<table className="w-full">
+						<thead className="bg-gray-50">
+							<tr>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									PO Number
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Supplier
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Items
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Total
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Status
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Order Date
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Expected
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Actions
+								</th>
+							</tr>
+						</thead>
+						<tbody className="bg-white divide-y divide-gray-200">
+							{orders.map((order) => (
+								<tr key={order.id} className="hover:bg-gray-50">
+									<td className="px-6 py-4 text-sm font-medium text-gray-900">
+										{order.id}
+									</td>
+									<td className="px-6 py-4 text-sm text-gray-900">
+										{order.supplier}
+									</td>
+									<td className="px-6 py-4 text-sm text-gray-900">
+										{order.items}
+									</td>
+									<td className="px-6 py-4 text-sm font-medium text-gray-900">
+										${order.total}
+									</td>
+									<td className="px-6 py-4">
+										<span
+											className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+												order.status
+											)}`}
+										>
+											{getStatusIcon(order.status)}
+											{order.status}
+										</span>
+									</td>
+									<td className="px-6 py-4 text-sm text-gray-500">
+										{order.orderDate}
+									</td>
+									<td className="px-6 py-4 text-sm text-gray-500">
+										{order.expectedDate}
+									</td>
+									<td className="px-6 py-4">
+										<div className="flex gap-2">
+											<button className="text-blue-600 hover:text-blue-800">
+												<Eye className="w-4 h-4" />
+											</button>
+											<button className="text-gray-600 hover:text-gray-800">
+												<Edit className="w-4 h-4" />
+											</button>
+										</div>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	);
+}
