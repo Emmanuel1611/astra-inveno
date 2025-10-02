@@ -115,6 +115,15 @@ export default function LandingPage() {
                 >
                   Explore Features
                 </Link>
+                {/* View Dashboard Button */}
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center justify-center px-8 py-4 border-2 border-indigo-500 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-50 hover:border-indigo-600 transition-all"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Dashboard
+                </Link>
               </div>
 
               <div className="flex items-center space-x-6 text-sm text-gray-600">
