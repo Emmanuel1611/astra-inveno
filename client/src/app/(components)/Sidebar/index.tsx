@@ -124,7 +124,7 @@ const Sidebar = () => {
       } bg-black/90 backdrop-blur-xl border-r border-white/10 text-white transition-all duration-300 h-full shadow-lg z-40 overflow-hidden`}
       style={{ width: sidebarWidth }}
     >
-      {/* Enhanced Logo Section */}
+      {/* Logo Section */}
       <div
         className={`flex gap-4 items-center pt-8 pb-6 ${
           isSidebarCollapsed ? "justify-center" : "px-6"
@@ -160,7 +160,7 @@ const Sidebar = () => {
       {/* Divider */}
       <div className="border-t border-white/10 mt-4" />
 
-      {/* Scrollable Content with Professional Scrollbar */}
+      {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         <style jsx>{`
           .custom-scrollbar::-webkit-scrollbar {
